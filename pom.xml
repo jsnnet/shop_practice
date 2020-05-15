@@ -168,11 +168,23 @@
 			<scope>provided</scope>
 			<version>2.1</version>
 		</dependency>
+
+		<!-- VirtualBox 에 설치된 Tomcat 과 버젼이 달라 주석화
 		<dependency>
 			<groupId>org.apache.tomcat.embed</groupId>
 			<artifactId>tomcat-embed-core</artifactId>
 			<version>9.0.33</version>
 		</dependency>
+		바로 아래에 CentOS 의 Tomcat 과 동일한 버젼의 Depengency 복붙 -->
+
+		<!-- https://mvnrepository.com/artifact/org.apache.tomcat.embed/tomcat-embed-core -->
+		<dependency>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-core</artifactId>
+			<version>8.5.27</version>
+		</dependency>
+
+
 		<!-- -->
 
 
