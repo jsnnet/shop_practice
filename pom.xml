@@ -15,6 +15,22 @@
 	<!-- -->
 
     <build>
+
+		<!-- http://www.kwangsiklee.com/2017/09/%EB%AC%B8%EC%A0%9C%ED%95%B4%EA%B2%B0-jenkins-unmappable-character-for-encoding/-->
+		<!-- unmappable character Error occurs -->
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<configuration>
+						<encoding>UTF-8</encoding>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+		<!-- -->
+
 		<sourceDirectory>src</sourceDirectory>
 		<resources>
 			<resource>
