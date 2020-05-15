@@ -13,7 +13,7 @@
         <project.reporting.outputEncoding>utf-8</project.reporting.outputEncoding>
     </properties>
 	<!-- -->
-    
+
     <build>
 		<sourceDirectory>src</sourceDirectory>
 		<resources>
