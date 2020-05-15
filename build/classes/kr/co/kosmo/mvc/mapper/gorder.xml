@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <!-- kr.co.ikosmo.mapper/myMember.xml -->
+<mapper namespace="gorder">
+	<select id="cnum" resultType="cvo">
+      select cnum from cart where rownum <![CDATA[ = ]]> 1 order by cnum desc
+   	</select>
+   
+	<resultMap type="mvo" id="memberResolve">
+		<id property="mnum" column="mnum" javaType="int"/>
+		<result property="mname" column="mname"/>
+		<result property="maddr1" column="maddr1"/>
+		<result property="maddr2" column="maddr2"/>
+		<result property="mpost" column="mpost"/>
+		<result property="mtel" column="mtel"/>
+		<collection property="cart" javaType="java.util.List" resultMap="cartResolcve" ofType="cvo"/>
+	</resultMap>
+	
+	<resultMap type="cvo" id="cartResolcve">
+		<id property="cnum" column="cnum" javaType="int"/>
+		<result property="chit" column="chit"/>
+		<association property="gagu" column="cnum" javaType="gvo">
+			<id property="gnum" column="gnum"/>
+			<result property="gname" column="gname"/>
+			<result property="gprice" column="gprice"/>
+			<result property="ginfo" column="ginfo"/>
+			<result property="gcolor" column="gcolor"/>
+		</association>
+	</resultMap>
+	
+	<select id="gorderlist" parameterType="map" resultMap="memberResolve">
+	select m.mnum mnum,m.mname mname,m.maddr1 maddr1, m.maddr2 maddr2,m.mpost mpost,m.mtel mtel,g.gnum gnum,g.gname gname,g.gprice gprice,g.ginfo ginfo, g.gcolor gcolor,c.cnum cnum,c.chit chit
+    from  member m, gagu g, cart c
+    <where>
+	m.mnum=c.mnum and g.gnum=c.gnum
+	and c.cnum in
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item.value}
+		</foreach>
+	</where>
+	</select>
+	
+	<insert id="gorderin" parameterType="govo">
+		insert into gorder values(gorder_seq.nextVal,#{mnum},sysdate,#{ototal},#{oname},#{oaddr1},#{oaddr2},#{opost},#{otel})
+	</insert>
+	
+	<insert id="gorderdetailin" parameterType="list">
+	
+		<foreach collection="gorderDetail" item="item" open="insert all" separator=" " close="select * from dual">
+		into gorderdetail(onum,gnum,odamount,odprice,cnum) values
+		(gorder_seq.currVal,#{item.gnum},#{item.odamount},#{item.odprice},#{item.cnum})
+		</foreach>
+	</insert>
+	
+	<delete id="delete" parameterType="list">
+		delete from cart
+		<where>
+			<foreach collection="gorderDetail" item="item" open="cnum in (" separator="," close=")">
+					#{item.cnum}
+			</foreach>
+		</where>
+	</delete>
+</mapper>   

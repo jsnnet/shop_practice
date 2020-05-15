@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="review">
+		<!-- 내가 쓴 리뷰 -->
+		<select id="myreview" resultType="rvo" parameterType="svo">
+			select * from (select rownum r_num, a.* from (  
+			select r.rnum, r.gnum, r.rtitle, r.rcontent, r.rdate, r.mid, r.rpwd, r.rgrade , g.gname 
+			from review r, gagu g where r.gnum=g.gnum and r.mid=#{mid}
+			) a ) 
+			where r_num between #{begin} and #{end}
+		</select>
+		
+		<!-- 리뷰 리스트 -->
+		<select id="reviewList" resultType="rvo" parameterType="svo">
+			select * from (select rownum r_num, a.* from (  
+			select r.rnum, r.gnum, r.rtitle, r.rcontent, r.rdate, r.mid, r.rpwd, r.rgrade 
+			from review r where r.gnum=#{gnum}
+			) a ) 
+			where r_num between #{begin} and #{end}
+		</select>
+		
+		<!-- 가구당 리뷰 수 -->
+		<select id="reviewCount" resultType="int" parameterType="int">
+			select count(rnum) rcnt from review where gnum=#{gnum}
+		</select>
+		
+		<!-- 나의 리뷰 수 -->
+		<select id="myReviewCount" resultType="int" parameterType="String">
+			select count(rnum) rcnt from review where mid=#{mid}
+		</select>
+		
+		<!-- 리뷰 페이징 -->
+		<select id="totalCount" resultType="int" parameterType="int">
+			select count(rnum) cnt from review where gnum=#{gnum}
+		</select>
+		
+		<!-- 리뷰 등록 -->
+		<insert id="add" parameterType="rvo">
+			insert into review values(review_seq.nextVal, 
+			#{gnum}, #{rtitle}, #{rcontent}, sysdate, #{mid}, #{rpwd}, #{rgrade})
+		</insert>
+		
+		<!-- 리뷰 수정 폼 -->
+		<select id="reviewForm" parameterType="int" resultType="rvo">
+			select rnum, gnum, rtitle, rcontent, rdate, mid, rpwd, rgrade
+			from review where rnum=#{rnum}
+		</select>
+		
+		<!-- 리뷰 수정 -->
+		<update id="update"  parameterType="rvo">
+			update review set rtitle=#{rtitle}, rcontent=#{rcontent}, rgrade=#{rgrade} 
+			where rnum=#{rnum}
+		</update>
+		
+		<!-- 리뷰 삭제 -->
+		<delete id="delete"  parameterType="int">
+			delete from review where rnum=#{rnum}
+		</delete>
+		
+	
+		
+	</mapper>

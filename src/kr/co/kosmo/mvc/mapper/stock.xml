@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="stock">
+  	<!-- 재고 부족분 리스트 -->
+  	<select id="shortage" resultType="gvo">
+  		select gnum,gname,ginum,ginfo,gcolor,gpicture,gsize,gcompany,gprice,gstock,ghit from gagu
+	  	where gstock <![CDATA[ <= ]]> 5 order by 1 asc 
+  	</select>
+  	
+  	<!-- 재고 물량 검색 리스트 수량-->
+  	<select id="total" resultType="int" parameterType="svo">
+		select count(*) from gagu
+		<if test="searchValue != null">
+			<where>
+				<choose>
+					<when test="searchType==0">
+					</when>
+					<when test="searchType==1">
+						gname like '%'||#{searchValue}||'%' 
+					</when>
+					<when test="searchType==2">
+						gcompany like '%'||#{searchValue}||'%'
+					</when>
+					<otherwise></otherwise>
+				</choose>
+			</where>
+		</if>
+		order by 1 asc 
+	</select>
+	<!-- 재고 물량 검색 리스트-->
+	<select id="list" resultType="gvo" parameterType="svo">
+		select * from (select rownum r_num, a.* from(
+		select row_number() over (order by gnum desc) as gnum,gname,ginum,ginfo,gcolor,gpicture,gsize,gcompany,gprice,gstock,ghit from gagu
+		<if test="searchValue != null">
+			<where>
+				<choose>
+					<when test="searchType==0">
+					</when>
+					<when test="searchType==1">
+						gname like '%'||#{searchValue}||'%' 
+					</when>
+					<when test="searchType==2">
+						gcompany like '%'||#{searchValue}||'%'
+					</when>
+					<otherwise></otherwise>
+				</choose>
+			</where>
+		</if>
+		order by 1 asc)a
+		)where r_num BETWEEN #{begin} and #{end}
+	</select>
+  	<!-- 재고 수량 업데이트 -->
+  	<update id="update" parameterType="map">
+  		update gagu set gstock = #{stock}+gstock where gnum = #{gnum}
+  	</update>
+  	
+  </mapper>

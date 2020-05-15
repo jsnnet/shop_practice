@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="semi_bteam:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="semi_bteam-0.0.1-SNAPSHOT.war">
+      <element id="artifact" artifact-name="semi_bteam:war exploded" />
+    </root>
+  </artifact>
+</component>

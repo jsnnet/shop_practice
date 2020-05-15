@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="chart">
+	<!-- 가구별 조회수 통계 리스트 -->
+	<select id="chartSumList" resultType="chartvo">
+		select
+		(select sum(cnt) from
+		productlog where ginum=1) as count1,
+		(select sum(cnt) from productlog
+		where ginum=2) as count2,
+		(select sum(cnt) from productlog where
+		ginum=3) as count3,
+		(select sum(cnt) from productlog where ginum=4) as
+		count4,
+		(select sum(cnt) from productlog where ginum=5) as count5,
+		(select sum(cnt) from productlog where ginum=6) as count6,
+		(select
+		sum(cnt) from productlog where ginum=7) as count7,
+		(select sum(cnt)
+		from productlog where ginum=9) as count9,
+		(select sum(cnt) from
+		productlog where ginum=10) as count10,
+		(select sum(cnt) from productlog
+		where ginum=11) as count11
+		from productlog
+		where rownum=1
+	</select>
+	<select id="chartStar" resultType="chartvo">
+		<!-- 리뷰 평점 가구별 합계 -->
+		select
+		(select avg(a.rgrade) from review a, gagu b, gaguitem gi where
+		gi.ginum =
+		b.ginum and a.gnum = b.gnum and b.ginum=1) as count21,
+		(select avg(a.rgrade) from review a, gagu b, gaguitem gi where
+		gi.ginum =
+		b.ginum and a.gnum = b.gnum and b.ginum=2) as count22,
+		(select avg(a.rgrade) from review a, gagu b, gaguitem gi where
+		gi.ginum =
+		b.ginum and a.gnum = b.gnum and b.ginum=3) as count23,
+		(select avg(a.rgrade) from review a, gagu b, gaguitem gi where
+		gi.ginum =
+		b.ginum and a.gnum = b.gnum and b.ginum=4) as count24,
+		(select avg(a.rgrade) from review a, gagu b, gaguitem gi where
+		gi.ginum =
+		b.ginum and a.gnum = b.gnum and b.ginum=5) as count25,
+		(select avg(a.rgrade) from review a, gagu b, gaguitem gi where
+		gi.ginum =
+		b.ginum and a.gnum = b.gnum and b.ginum=6) as count26,
+		(select avg(a.rgrade) from review a, gagu b, gaguitem gi where
+		gi.ginum =
+		b.ginum and a.gnum = b.gnum and b.ginum=7) as count27,
+		(select avg(a.rgrade) from review a, gagu b, gaguitem gi where
+		gi.ginum =
+		b.ginum and a.gnum = b.gnum and b.ginum=9) as count29,
+		(select avg(a.rgrade) from review a, gagu b, gaguitem gi where
+		gi.ginum =
+		b.ginum and a.gnum = b.gnum and b.ginum=10) as count210,
+		(select avg(a.rgrade) from review a, gagu b, gaguitem gi where
+		gi.ginum =
+		b.ginum and a.gnum = b.gnum and b.ginum=11) as count211
+		from
+		review
+		where rownum = 1
+		<!-- 매주 매출 통계 GYP -->
+	</select>
+	<select id="chartMoney" resultType="chartvo">
+		select
+		(select
+		nvl(sum(ototal),0) from gorder where trunc(odate) = trunc(sysdate))
+		as
+		count31,
+		(select nvl(sum(ototal),0) from gorder where trunc(odate) =	trunc(sysdate-1))as count32,
+		(select nvl(sum(ototal),0) from gorder	where trunc(odate) =trunc(sysdate-2))as count33,
+		(select	nvl(sum(ototal),0) from gorder where trunc(odate) =	trunc(sysdate-3))as count34,
+		(select nvl(sum(ototal),0) from gorder	where trunc(odate) =trunc(sysdate-4))as count35,
+		(select	nvl(sum(ototal),0) from gorder where trunc(odate) =	trunc(sysdate-5))as count36,
+		(select nvl(sum(ototal),0) from gorder	where trunc(odate) =trunc(sysdate-6))as count37
+		from gorder
+		where
+		rownum=1
+	</select>
+	<select id="chartDate" resultType="chartvo">
+	select 
+        (select to_char(sysdate,'MM-dd') from gorder where rownum=1) as today,
+        (select to_char(sysdate-1,'MM-dd') from gorder where rownum=1) as today1,
+        (select to_char(sysdate-2,'MM-dd') from gorder where rownum=1) as today2,
+        (select to_char(sysdate-3,'MM-dd') from gorder where rownum=1) as today3,
+        (select to_char(sysdate-4,'MM-dd') from gorder where rownum=1) as today4,
+        (select to_char(sysdate-5,'MM-dd') from gorder where rownum=1) as today5,
+        (select to_char(sysdate-6,'MM-dd') from gorder where rownum=1) as today6
+        from gorder 
+        where rownum = 1
+	</select>
+	<select resultType="chartvo" id="chartRanking">
+		select m.mname, count(l.mnum) cnt from loginlog l, member m
+		where m.mnum=l.mnum and l.llstatus='login' and m.mname != '관리자' 
+		GROUP by m.mname ORDER BY cnt desc 
+	</select>
+</mapper>
