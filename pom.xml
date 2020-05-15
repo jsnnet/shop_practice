@@ -151,5 +151,25 @@
 			<artifactId>jackson-databind</artifactId>
 			<version>2.8.6</version>
 		</dependency>
+
+		<!-- Compilation Error 중 package does not exist -->
+		<!-- https://m.blog.naver.com/PostView.nhn?blogId=dodut&logNo=221049757006&proxyReferer=https:%2F%2Fwww.google.com%2F -->
+		<!-- https://okky.kr/article/185862 -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<scope>provided</scope>
+			<version>2.5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet.jsp</groupId>
+			<artifactId>jsp-api</artifactId>
+			<scope>provided</scope>
+			<version>2.1</version>
+		</dependency>
+		<!-- -->
+
+
 	</dependencies>
 </project>
