@@ -63,6 +63,16 @@
 					<warSourceDirectory>WebContent</warSourceDirectory>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat8-maven-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+					<url>http://localhost:8080/manager/test</url>
+					<server>TomcatServer</server>
+					<path>/test</path>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 	<dependencies>
