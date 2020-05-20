@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="gaguAdmin">
+
+	<!-- 가구 종류 불러오기 -->
+	<select id="gaguItemList" resultType="givo">
+		select ginum, giname,
+		gicontent from gaguitem order by ginum asc
+	</select>
+
+	<!-- 가구 추가 -->
+	<insert id="gaguAdd" parameterType="gvo">
+		insert into gagu values (
+		gagu_seq.nextVal, #{gname}, #{ginum}, #{ginfo}, #{gcolor},
+		#{gpicture}, #{gsize}, #{gcompany},
+		#{gprice}, #{gstock}, 0, #{gdetail}
+		)
+	</insert>
+
+	<!-- 페이징을 위한 ROW 수 -->
+	<select id="totalCount" resultType="int" parameterType="svo">
+		select count(*) cnt from
+		gagu g
+		<if test="searchValue != null">
+			<where>
+				<choose>
+					<when test="searchType==1">
+						gname like '%' || #{searchValue} || '%'
+					</when>
+					<when test="searchType==2">
+						(select
+						giname from gaguitem gi where g.ginum =
+						gi.ginum) like '%' || #{searchValue} || '%'
+					</when>
+					<when test="searchType==3">
+						gprice <![CDATA[ < ]]>
+						#{searchValue}
+					</when>
+					<otherwise></otherwise>
+				</choose>
+			</where>
+		</if>
+	</select>
+
+	<!-- 가구 리스트 + 검색 + 정렬 -->
+	<select id="gaguList" resultType="gvo" parameterType="svo">
+		select * from (
+		select rownum r_num, a.* from (
+		select g.gnum, gname,
+		gpicture, gprice, TRUNC(avg(r.rgrade), 1) as rgrade
+		from gagu g, review r
+		where r.gnum(+) = g.gnum
+		<if test="searchValue != null">
+			<choose>
+				<when test="searchType==1">
+					and gname like '%' || #{searchValue} || '%'
+				</when>
+				<when test="searchType==2">
+					and (select
+					giname from gaguitem gi where g.ginum =
+					gi.ginum) like '%' || #{searchValue} || '%'
+				</when>
+				<when test="searchType==3">
+					and gprice <![CDATA[ < ]]>
+					#{searchValue}
+				</when>
+				<otherwise></otherwise>
+			</choose>
+		</if>
+		group by g.gnum, gname, gpicture, gprice
+		<if test="sortValue != null">
+			<choose>
+				<when test="sortValue==1">
+					order by gnum desc
+				</when>
+				<when test="sortValue==2">
+					order by gname asc
+				</when>
+				<when test="sortValue==3">
+					order by gname desc
+				</when>
+				<when test="sortValue==4">
+					order by gprice asc
+				</when>
+				<when test="sortValue==5">
+					order by gprice desc
+				</when>
+			</choose>
+		</if>
+		<if test="sortValue == null or sortValue == ''">
+			order by gnum desc
+		</if>
+		) a ) where r_num between
+		#{begin} and #{end}
+	</select>
+
+	<!-- 가구 상세 -->
+	<select id="gaguDetail" resultType="gvo" parameterType="int">
+		select
+		g.gnum, gname, (select
+		giname from gaguitem gi where g.ginum = gi.ginum)
+		as giname, ginum,
+		to_char(ginfo) as ginfo, gcolor, gpicture, gsize, gcompany, gprice, gstock,
+		ghit, TRUNC(avg(r.rgrade), 1) as rgrade, gdetail
+		from gagu g, review r
+		where g.gnum = r.gnum(+) and g.gnum = #{gnum}
+		group by g.gnum, gname, ginum, to_char(ginfo), gcolor, gpicture, gsize, gcompany, gprice, gstock, ghit, gdetail
+	</select>
+
+	<!-- 가구 수정 -->
+	<update id="gaguUpdate" parameterType="gvo">
+		update gagu set
+		gname=#{gname}, ginum=#{ginum},
+		ginfo=#{ginfo}, gcolor=#{gcolor},
+		gpicture=#{gpicture}, gsize=#{gsize}, gcompany=#{gcompany},
+		gprice=#{gprice}, gstock=#{gstock}, gdetail=#{gdetail} where
+		gnum = #{gnum}
+	</update>
+
+	<!-- 가구 삭제 -->
+	<delete id="gaguDelete" parameterType="int">
+		delete from gagu where
+		gnum=#{gnum}
+	</delete>
+</mapper> 

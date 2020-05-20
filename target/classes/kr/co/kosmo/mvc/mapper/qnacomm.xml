@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="qnacomm">
+	<insert id="ins" parameterType="qcvo">
+		insert into qna_comment values(QNA_COMMENT_SEQ.nextVal,#{qnum},#{mnum},#{qccontent},sysdate)
+	</insert>
+	<select id="list" parameterType="int" resultType="qcvo">
+		select qcnum , c.qnum qnum, c.mnum mnum, qccontent, m.mid, m.madmin, c.qcdate 
+		from member m, qna_comment c where c.mnum= m.mnum and c.qnum=#{qnum} order by 1 desc
+	</select>
+	<delete id="delete" parameterType="int">
+		delete from qna_comment where qcnum=#{qcnum}
+	</delete>
+	<update id="update" parameterType="qcvo">
+		update qna_comment set qccontent=#{qccontent} where qcnum=#{qcnum}
+	</update>
+	<select id="detail" parameterType="int" resultType="qcvo">
+		select qc.qcnum,qc.mnum,qc.qccontent,m.mid, qc.qcdate from qna_comment qc, member m where qc.qcnum=#{qcnum} and qc.mnum=m.mnum
+	</select>
+</mapper>

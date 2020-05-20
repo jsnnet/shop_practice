@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="searchLog">
+
+	<!-- 첫 로그 추가 -->
+	<insert id="logInsert" parameterType="slogvo">
+		insert into searchlog
+		values (
+		searchlog_seq.nextVal, #{slvalue}, sysdate, 0)
+	</insert>
+
+	<!-- 기존 로그 여부 체크 -->
+	<select id="logCheck" parameterType="slogvo" resultType="int">
+		select
+		count(*) cnt
+		from searchlog
+		where slvalue = #{slvalue} and
+		to_char(sldate) = #{sldate}
+	</select>
+
+	<!-- 기존 로그 cnt + 1 -->
+	<update id="logUpdate" parameterType="slogvo">
+		update searchlog set slcnt = slcnt + 1 where slvalue = #{slvalue} and trunc(sldate) = to_date(#{sldate}, 'yy/MM/dd')
+	</update>
+
+	<!-- 검색어 가장 많이 검색한 순서로 5개 뽑기 -->
+	<select id="logRankList" resultType="slogvo" parameterType="slogvo">
+		select * from (
+		select slvalue, sum(slcnt) as slcnt from searchlog
+		where TRUNC(SYSDATE) - TRUNC(sldate) between 0 and 3
+		group by slvalue
+		order by slcnt desc, slvalue asc
+		) where ROWNUM  <![CDATA[ < ]]> 6
+	</select>
+</mapper> 

@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usermember">
+	<!-- 회원가입 -->
+	<insert id="join" parameterType="mvo">
+		insert into member
+		values(member_seq.nextVal,#{mid},#{mpwd},#{mname},#{maddr1},#{maddr2},#{mpost},#{mtel},#{memail},sysdate,'1')
+	</insert>
+
+	<!-- 아이디 중복 체크 -->
+	<select id="idChk" parameterType="String" resultType="int">
+		select
+		count(*) cnt from member where mid=#{mid}
+	</select>
+
+	<!-- 아이디, 비밀번호 체크 -->
+	<select id="loginChk" parameterType="mvo" resultType="mvo">
+		select
+		mnum, mid, mname, maddr1, maddr2, mpost, mtel,memail, madmin from
+		member where mid=#{mid} and mpwd=#{mpwd}
+	</select>
+
+	<!-- 아이디, 비밀번호 일치 여부 검사 -->
+	<select parameterType="mvo" id="idpwdCheck" resultType="int">
+		select count(*) cnt from member where mid=#{mid} and mpwd=#{mpwd} 
+	</select>
+	
+	<!-- 로그인 로그 -->
+	<insert parameterType="logvo" id="loginlog">
+		insert into loginlog
+		values(loginlog_seq.nextVal, #{mnum}, #{llstatus}, sysdate, #{reip})
+	</insert>
+
+	<!-- 접속 로그 -->
+	<select id="mylog" parameterType="svo" resultType="logvo">
+		select * from
+		(select rownum r_num, a.* from(select l.llnum, l.mnum,
+		l.llstatus,
+		l.lltime, l.reip from loginlog l, member m where
+		l.mnum=m.mnum and
+		l.mnum=#{searchType} order by 1 desc)a) where r_num
+		BETWEEN #{begin}
+		and #{end}
+	</select>
+
+	<!-- 로그 페이징 -->
+	<select id="logtotalCount" resultType="int" parameterType="int">
+		select count(*) from loginlog where mnum=#{mnum}
+	</select>
+
+	<!-- 마이페이지 회원정보 조회 -->
+	<select parameterType="String" id="ins" resultType="mvo">
+		select
+		mid,mpwd,mname,maddr1,maddr2,mpost,mtel,memail from member where
+		mid=#{mid}
+	</select>
+
+
+	<!-- 마이페이지 회원정보 수정 -->
+	<update parameterType="mvo" id="updateMember">
+		update member set
+		mid=#{mid},mpwd=#{mpwd},mname=#{mname},maddr1=#{maddr1},maddr2=#{maddr2},mtel=#{mtel},memail=#{memail}
+		where mid=#{mid}
+	</update>
+
+	<!-- 마이페이지 회원탈퇴를 위한 -->
+	<delete parameterType="String" id="deleteMember">
+		delete from member where
+		mid=#{mid}
+	</delete>
+
+	<!-- 주문과 주문상세 -->
+	<resultMap type="govo" id="mypurchase">
+		<id property="onum" javaType="int" column="onum" />
+		<result property="mnum" column="mnum" />
+		<result property="odate" column="odate" />
+		<result property="ototal" column="ototal" />
+		<result property="oname" column="oname" />
+		<result property="oaddr1" column="oaddr1" />
+		<result property="oaddr2" column="oaddr2" />
+		<result property="opost" column="opost" />
+		<result property="otel" column="otel" />
+		<collection property="gorderDetail"
+			javaType="java.util.List" resultMap="gorderResult" ofType="godvo" />
+		<!-- <association property="gorderDetail" javaType="gdvo" column="onum"> 
+			<id property="odnum" column="odnum" javaType="int"/> <result property="onum" 
+			column="onum"/> <result property="gnum" column="gnum"/> <result property="odamount" 
+			column="odamount"/> <result property="odprice" column="odprice"/> <result 
+			property="cnum" column="cnum"/> <collection property="gagu" javaType="java.util.List" 
+			resultMap="gaguResult" ofType="gvo"/> </association> -->
+	</resultMap>
+
+	<resultMap type="godvo" id="gorderResult">
+		<id property="odnum" column="odnum" javaType="int" />
+		<result property="onum" column="onum" />
+		<result property="gnum" column="gnum" />
+		<result property="odamount" column="odamount" />
+		<result property="odprice" column="odprice" />
+		<result property="cnum" column="cnum" />
+		<association property="gagu" column="gnum" javaType="gvo">
+			<id property="gnum" column="gnum" javaType="int" />
+			<result property="gname" column="gname" />
+			<result property="gcolor" column="gcolor" />
+			<result property="gpicture" column="gpicture" />
+			<result property="gprice" column="gprice" />
+		</association>
+	</resultMap>
+	<!-- 가구 -->
+	<!-- <resultMap type="gvo" id="gaguResult"> <id property="gnum" column="gnum" 
+		javaType="int"/> <result property="gname" column="gname"/> <result property="gcolor" 
+		column="gcolor"/> <result property="gpicture" column="gpicture"/> <result 
+		property="gprice" column="gprice"/> </resultMap> -->
+
+	<!-- 구매내역조회 -->
+
+
+	<select parameterType="int" id="purchase" resultMap="mypurchase">
+		select o.onum onum, o.mnum mnum, o.odate odate, o.ototal
+		ototal,o.oname oname,o.oaddr1 oaddr1, o.oaddr2 oaddr2,o.opost
+		opost,o.otel,og.odnum odnum ,og.gnum gnum, og.odamount odamount,
+		og.odprice odprice,og.cnum cnum,g.gname gname,g.ginfo ginfo,g.gcolor
+		gcolor, g.gpicture gpicture, g.gprice gprice,m.mtel 
+		from gorder o, gorderdetail og, gagu g,member m
+		where o.onum=og.onum and og.gnum=g.gnum and m.mnum=o.mnum and o.mnum=#{mnum} order by 1 desc
+	</select>
+
+	<select parameterType="int" id="purchaseDetail" resultMap="mypurchase">
+		select o.onum onum, o.mnum mnum, o.odate odate, o.ototal
+		ototal,o.oname oname,o.oaddr1 oaddr1, o.oaddr2 oaddr2,o.opost
+		opost,o.otel,og.odnum odnum ,og.gnum gnum, og.odamount odamount,
+		og.odprice odprice,og.cnum cnum,g.gname gname,g.ginfo ginfo,g.gcolor
+		gcolor, g.gpicture gpicture, g.gprice gprice,m.mtel
+		from gorder o, gorderdetail og, gagu g,member m 
+		where o.onum=og.onum and og.gnum=g.gnum and m.mnum=o.mnum and o.onum=#{onum} order by 1 desc
+	</select>
+
+	<!-- 문의내역 조회 -->
+	<select parameterType="String" id="myqna1" resultType="qvo">
+		select
+		row_number() over (order by q.qdate) as mynum,
+		m.mid,m.mname,m.mnum,q.qnum,q.qtitle,q.qcatagory,q.mnum,q.qdate
+		from
+		member m, qna q where q.mnum = m.mnum and m.mid =#{mid} order by
+		q.qdate desc
+	</select>
+	
+	   <!-- 출석체크 페이지 -->
+   
+   <resultMap type="avo" id="avoresult">
+      <id property="attid" column="attid" javaType="int"/>
+      <result property="attdatetime" column="attdatetime"/>
+      <result property="mnum" column="mnum"/>
+      <result property="start" column="attdate"/>
+      <result property="end" column="attdate"/>
+      <result property="attdate" column="attdate"/>
+      <result property="title" column="title"/>
+      
+   </resultMap>
+   
+   <!--기존 출석체크  -->
+   <select id="attend" parameterType="int" resultMap="avoresult">
+   		select mnum,attid,to_char(attdate,'YYYY-MM-DD' ) attdate,to_char(attdatetime,'HH24:MI:SS' ) attdatetime,title 
+   		from attend where mnum = #{mnum} order by attdate asc
+   </select>
+   
+   <!--출석체크 캘린더  -->
+   <insert id="attendclins" parameterType="avo">
+   		insert into attend VALUES(ATTEND_SEQ.nextval,#{mnum},sysdate,sysdate,#{title})
+   </insert>
+   
+   <!-- 중복체크 -->
+   <select id="attendCheck" parameterType="int" resultType="int">
+   		select count(*) from attend
+    		where TRUNC(sysdate) = trunc(attdate) and mnum = #{mnum}
+   </select>
+   <!--금일 체크  -->
+   <select id="attendToday" parameterType="int" resultMap="avoresult">
+   		select mnum,attid,to_char(attdate,'YYYY-MM-DD' ) attdate,to_char(attdatetime,'HH24:MI:SS' ) attdatetime,title 
+   		from attend where mnum = #{mnum}  and rownum <![CDATA[ = ]]> 1 order by 2 desc
+   </select>
+   
+</mapper>

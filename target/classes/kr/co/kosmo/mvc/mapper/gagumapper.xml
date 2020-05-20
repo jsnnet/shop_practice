@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="gagushop">
+	<!-- 가구입력 -->
+	<insert id="gagusave" parameterType="gvo">
+		insert into gagu
+		values(gagu_seq.nextVal, #{gname}, #{ginum}, #{ginfo}, #{gcolor}
+		,#{gpicture}, #{gsize}, #{gcompany}, #{gprice}, #{gstock}, #{ghit})
+	</insert>
+	<!-- 가구 전체 -->
+	<select parameterType="int" id="total" resultType="int">
+		select
+		count(*) from gagu where ginum=#{ginum} 
+	</select>
+
+	<!-- 메인페이지용 리스트 -->
+	<select parameterType="svo" id="gaguRecentlyList" resultType="gvo">
+		select gnum, gname, gpicture from gagu order by gnum desc
+	</select>
+
+	<!-- 상품 리스트용 -->
+	<select parameterType="svo" id="gaguList" resultType="gvo">
+		select * from (select rownum r_num, a.* 
+		from(select g.gnum, gname, gpicture, gprice, TRUNC(avg(r.rgrade), 1) as rgrade
+		from gagu g, review r 
+		where r.gnum(+) = g.gnum
+		<if test="searchValue != null">
+			and g.ginum=#{searchValue} 
+		</if>
+		group by g.gnum, gname, gpicture, gprice order by g.gnum desc)a)
+		where r_num BETWEEN #{begin} and #{end}
+	</select>
+
+	<!-- 가구 상세 -->
+	<select id="gaguDetail" resultType="gvo" parameterType="int">
+		select
+		g.gnum, gname, (select
+		giname from gaguitem gi where g.ginum =
+		gi.ginum)
+		as giname, ginum,
+		to_char(ginfo) as ginfo, gcolor, gpicture,
+		gsize, gcompany, gprice, gstock,
+		ghit, TRUNC(avg(r.rgrade), 1) as
+		rgrade, gdetail
+		from gagu g, review r
+		where g.gnum = r.gnum(+) and g.gnum =
+		#{gnum}
+		group by g.gnum, gname, ginum, to_char(ginfo), gcolor,
+		gpicture, gsize, gcompany, gprice, gstock, ghit, gdetail
+	</select>
+
+	<!-- 가구 종류 불러오기 -->
+	<select parameterType="int" id="gaguItemList" resultType="givo">
+		select
+		ginum, giname, gicontent, gititle from gaguitem where ginum=#{ginum}
+	</select>
+
+</mapper>

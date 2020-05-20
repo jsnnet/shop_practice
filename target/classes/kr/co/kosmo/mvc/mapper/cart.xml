@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <!-- kr.co.ikosmo.mapper/myMember.xml -->
+<mapper namespace="cart">
+	<!-- 장바구니 상품 추가 -->
+	<insert id="incart" parameterType="map">
+	insert into cart values(cart_seq.nextVal,#{mnum},#{gnum},#{chit})
+	</insert>
+	<!-- 장바구니 리스트 select gagu,cart,member-->
+	<resultMap type="mvo" id="memberResolve">
+		<id property="mnum" column="mnum" javaType="int"/>
+		<collection property="cart" javaType="java.util.List" resultMap="cartResolcve" ofType="cvo"/>
+	</resultMap>
+	<resultMap type="cvo" id="cartResolcve">
+		<id property="cnum" column="cnum" javaType="int"/>
+		<result property="chit" column="chit"/>
+		<association property="gagu" column="cnum" javaType="gvo">
+			<id property="gnum" column="gnum"/>
+			<result property="gpicture" column="gpicture"/>
+			<result property="gname" column="gname"/>
+			<result property="gprice" column="gprice"/>
+			<result property="gcolor" column="gcolor"/>
+			<result property="gstock" column="gstock"/>
+		</association>
+	</resultMap>
+	
+	<select id="list" parameterType="int" resultMap="memberResolve">
+	select m.mnum mnum,g.gnum gnum,c.cnum cnum, g.gpicture gpicture,g.gname gname,g.gprice gprice,c.chit chit,g.gcolor gcolor,g.gstock gstock
+	from member m, gagu g, cart c
+	where m.mnum=c.mnum(+) and g.gnum=c.gnum
+	and m.mnum = #{mnum}
+	</select>
+	<!-- 장바구니 상품 수정 -->
+	<update id="update" parameterType="cvo">
+	update cart set chit = #{chit} where cnum = #{cnum}
+	</update>
+	<!-- 장바구니 상품 삭제 -->
+	<delete id="delete" parameterType="cvo">
+	delete cart where cnum = #{cnum} and mnum = #{mnum}
+	</delete>
+</mapper>   
+
+
