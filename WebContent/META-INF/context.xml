@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context>
-	<Resource name="jdbc/myoracle"
+	<!--<Resource name="jdbc/myoracle"
 		auth="Container"
 		type="javax.sql.DataSource"
 		driverClassName="oracle.jdbc.driver.OracleDriver"
@@ -10,5 +10,9 @@
 		maxActive="20"
 		maxIdle="10"
 		maxWait="-1"
-	/>
+	/>-->
+
+	<role rolename="manager-gui"/>
+	<role rolename="manager-script"/>
+	<role username="tomcat" password="tomcat" roles="manager-gui, manager-script"/>
 </Context>
