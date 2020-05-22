@@ -15,4 +15,3 @@
 	<role rolename="manager-gui"/>
 	<role rolename="manager-script"/>
 	<role username="tomcat" password="tomcat" roles="manager-gui, manager-script"/>
-</Context>

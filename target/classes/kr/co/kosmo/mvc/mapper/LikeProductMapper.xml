@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="likeProduct">
+
+	<!-- 첫 로그 추가 -->
+	<insert id="logAdd" parameterType="plogvo">
+		<selectKey resultType="int" keyProperty="ginum"
+			order="BEFORE">
+			select ginum from gagu where gnum = #{gnum}
+		</selectKey>
+		insert into productlog values (
+		productlog_seq.nextVal, #{mnum},
+		#{ginum}, 0, sysdate)
+	</insert>
+
+	<!-- 가구종류 번호 가져오기 -->
+	<select id="logGinumSelect" parameterType="int" resultType="int">
+		select ginum from gagu where gnum = #{gnum}
+	</select>
+
+	<!-- 기존 로그 여부 체크 -->
+	<select id="logCheck" parameterType="plogvo" resultType="int">
+		select
+		count(*) cnt
+		from productlog p, (select ginum from gagu where gnum =
+		#{gnum}) g
+		where p.mnum = #{mnum} and p.ginum = g.ginum
+	</select>
+
+	<!-- 기존 로그 cnt + 1 -->
+	<update id="logUpdate" parameterType="plogvo">
+		update productlog set cnt =
+		cnt + 1 where mnum = #{mnum} and ginum = #{ginum}
+	</update>
+
+	<!-- 가장 많이 클릭한 가구종류 번호 가져오기 -->
+	<select id="logMemberGinumSelect" parameterType="int"
+		resultType="int">
+		select ginum
+		from (select row_number() over (order by cnt desc) as
+		rank,
+		mnum, ginum, cnt
+		from productlog p where mnum= #{mnum})
+		where rank = 1
+	</select>
+
+	<!-- 가구 종류에 속하는 가구 리뷰 평균 평점 내림차순으로 4개 뽑기 -->
+	<select id="logGaguList" parameterType="int" resultType="gvo">
+		select * from (select g.gnum, gname, gprice, gpicture, avg(r.rgrade)
+		as rgrade
+		from gagu g, review r
+		where ginum = #{ginum} and r.gnum(+) = g.gnum
+		group by g.gnum, gname, gprice, gpicture
+		order by rgrade desc nulls last
+		) where ROWNUM <![CDATA[ < ]]> 5
+	</select>
+</mapper> 

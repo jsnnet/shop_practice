@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+	PUBLIC "-//mybatis.org//DTO Config 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	<typeAliases>
+		<typeAlias alias="mvo" type="kr.co.kosmo.mvc.dto.MemberVO" />
+		<typeAlias alias="qvo" type="kr.co.kosmo.mvc.dto.QnAVO" />
+		<typeAlias alias="qcvo" type="kr.co.kosmo.mvc.dto.QnaCommVO" />
+		<typeAlias alias="svo" type="kr.co.kosmo.mvc.dto.SearchVO" />
+		<typeAlias alias="nvo" type="kr.co.kosmo.mvc.dto.NoticeVO" />
+		<typeAlias alias="ncvo" type="kr.co.kosmo.mvc.dto.NoticeCommVO" />
+		<typeAlias alias="gvo" type="kr.co.kosmo.mvc.dto.GaguVO" />
+		<typeAlias alias="givo" type="kr.co.kosmo.mvc.dto.GaguItemVO" />
+		<typeAlias alias="rvo" type="kr.co.kosmo.mvc.dto.ReviewVO" />
+		<typeAlias alias="cvo" type="kr.co.kosmo.mvc.dto.CartVO" />
+		<typeAlias alias="logvo" type="kr.co.kosmo.mvc.dto.LoginLoggerVO" />
+		<typeAlias type="kr.co.kosmo.mvc.dto.GorderVO" alias="govo" />
+		<typeAlias type="kr.co.kosmo.mvc.dto.GorderDetailVO" alias="godvo" />
+		<typeAlias type="kr.co.kosmo.mvc.dto.GorderListVO" alias="godlvo" />
+		<typeAlias type="kr.co.kosmo.mvc.dto.ProductLogVO" alias="plogvo"/>
+		<typeAlias type="kr.co.kosmo.mvc.dto.SearchLogVO" alias="slogvo"/>
+		<typeAlias type="kr.co.kosmo.mvc.dto.AttendVO" alias="avo"/>
+		<typeAlias type="kr.co.kosmo.mvc.dto.ChartVO" alias="chartvo"/>
+	</typeAliases>
+</configuration>
